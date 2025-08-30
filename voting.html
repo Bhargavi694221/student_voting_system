@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Voting System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #4e54c8;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            background: white;
+            color: #4e54c8;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .screen {
+            display: none;
+        }
+        
+        .active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #4e54c8;
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.2);
+            outline: none;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            background: #4e54c8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            background: #3f44a7;
+            transform: translateY(-2px);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #4e54c8;
+            color: #4e54c8;
+        }
+        
+        .btn-outline:hover {
+            background: #4e54c8;
+            color: white;
+        }
+        
+        .card {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #4e54c8;
+            font-weight: 600;
+        }
+        
+        .candidate {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .candidate:hover {
+            background: #f0f4ff;
+            border-color: #4e54c8;
+        }
+        
+        .candidate.selected {
+            background: #e6eeff;
+            border-color: #4e54c8;
+            box-shadow: 0 0 0 2px rgba(78, 84, 200, 0.3);
+        }
+        
+        .candidate-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 15px;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+            font-size: 24px;
+        }
+        
+        .candidate-info {
+            flex: 1;
+        }
+        
+        .candidate-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .candidate-position {
+            color: #777;
+            font-size: 14px;
+        }
+        
+        .radio-btn {
+            width: 22px;
+            height: 22px;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            transition: all 0.3s;
+        }
+        
+        .radio-btn::after {
+            content: "";
+            width: 12px;
+            height: 12px;
+            background: #4e54c8;
+            border-radius: 50%;
+            display: none;
+        }
+        
+        .candidate.selected .radio-btn {
+            border-color: #4e54c8;
+        }
+        
+        .candidate.selected .radio-btn::after {
+            display: block;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background: #ffebee;
+            color: #d32f2f;
+            border-left: 4px solid #d32f2f;
+        }
+        
+        .alert.success {
+            background: #e8f5e9;
+            color: #388e3c;
+            border-left-color: #388e3c;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+        }
+        
+        .tab.active {
+            border-bottom-color: #4e54c8;
+            color: #4e54c8;
+        }
+        
+        .results {
+            margin-top: 20px;
+        }
+        
+        .result-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .result-name {
+            width: 150px;
+            font-weight: 500;
+        }
+        
+        .result-bar-container {
+            flex: 1;
+            height: 20px;
+            background: #eee;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .result-bar {
+            height: 100%;
+            background: #4e54c8;
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+        
+        .result-votes {
+            width: 80px;
+            text-align: right;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 10px;
+            }
+            
+            header h1 {
+                font-size: 24px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .candidate {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .candidate-img {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-vote-yea"></i>
+            </div>
+            <h1>Student Voting System</h1>
+            <p>Cast your vote for student representatives</p>
+        </header>
+        
+        <div class="content">
+            <!-- Login Screen -->
+            <div class="screen active" id="login-screen">
+                <div class="card">
+                    <div class="card-title">Student Login</div>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label for="student-id">Student ID</label>
+                            <input type="text" class="form-control" id="student-id" placeholder="Enter your student ID">
+                        </div>
+                        <div class="form-group">
+                            <label for="pin">PIN</label>
+                            <input type="password" class="form-control" id="pin" placeholder="Enter your PIN">
+                        </div>
+                        <button type="submit" class="btn btn-block">Login</button>
+                    </form>
+                </div>
+                <p class="text-center">Demo: Use ID "12345" and PIN "2023"</p>
+            </div>
+            
+            <!-- Voting Screen -->
+            <div class="screen" id="voting-screen">
+                <div class="card">
+                    <div class="card-title">Student Council Elections</div>
+                    <p>Select your preferred candidate for each position:</p>
+                    
+                    <div class="tabs">
+                        <div class="tab active" data-category="president">President</div>
+                        <div class="tab" data-category="vice-president">Vice President</div>
+                        <div class="tab" data-category="secretary">Secretary</div>
+                    </div>
+                    
+                    <div id="candidates-container">
+                        <!-- President Candidates -->
+                        <div class="candidates-category active" id="president-candidates">
+                            <div class="candidate" data-id="1">
+                                <div class="radio-btn"></div>
+                                <div class="candidate-img">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="candidate-info">
+                                    <div class="candidate-name">Bhargavi Thota</div>
+                                    <div class="candidate-position">Computer Science Major</div>
+                                </div>
+                            </div>
+                            <div class="candidate" data-id="2">
+                                <div class="radio-btn"></div>
+                                <div class="candidate-img">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="candidate-info">
+                                    <div class="candidate-name">Rani Thota</div>
+                                    <div class="candidate-position">Business Administration</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Vice President Candidates -->
+                        <div class="candidates-category" id="vice-president-candidates">
+                            <div class="candidate" data-id="3">
+                                <div class="radio-btn"></div>
+                                <div class="candidate-img">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="candidate-info">
+                                    <div class="candidate-name">Sindhu Mendu</div>
+                                    <div class="candidate-position">Engineering Major</div>
+                                </div>
+                            </div>
+                            <div class="candidate" data-id="4">
+                                <div class="radio-btn"></div>
+                                <div class="candidate-img">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="candidate-info">
+                                    <div class="candidate-name">Abhinaya Mallem</div>
+                                    <div class="candidate-position">psychologist</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Secretary Candidates -->
+                        <div class="candidates-category" id="secretary-candidates">
+                            <div class="candidate" data-id="5">
+                                <div class="radio-btn"></div>
+                                <div class="candidate-img">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="candidate-info">
+                                    <div class="candidate-name">Pujitha Ethakota</div>
+                                    <div class="candidate-position">English Literature</div>
+                                </div>
+                            </div>
+                            <div class="candidate" data-id="6">
+                                <div class="radio-btn"></div>
+                                <div class="candidate-img">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="candidate-info">
+                                    <div class="candidate-name">Jyothi Nune</div>
+                                    <div class="candidate-position">Education Major</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert" id="vote-alert" style="display: none;">
+                        Please select a candidate before proceeding.
+                    </div>
+                    
+                    <button class="btn btn-block" id="cast-vote-btn">Cast Your Vote</button>
+                    <button class="btn btn-outline btn-block" id="view-results-btn">View Results</button>
+                </div>
+            </div>
+            
+            <!-- Results Screen -->
+            <div class="screen" id="results-screen">
+                <div class="card">
+                    <div class="card-title">Election Results</div>
+                    
+                    <div class="results">
+                        <h3>President</h3>
+                        <div class="result-item">
+                            <div class="result-name">Bhargavi Thota</div>
+                            <div class="result-bar-container">
+                                <div class="result-bar" style="width: 65%;"></div>
+                            </div>
+                            <div class="result-votes">65%</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-name">Rani Thota</div>
+                            <div class="result-bar-container">
+                                <div class="result-bar" style="width: 35%;"></div>
+                            </div>
+                            <div class="result-votes">35%</div>
+                        </div>
+                        
+                        <h3>Vice President</h3>
+                        <div class="result-item">
+                            <div class="result-name">Sindhu Mendu</div>
+                            <div class="result-bar-container">
+                                <div class="result-bar" style="width: 48%;"></div>
+                            </div>
+                            <div class="result-votes">48%</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-name">Abhinaya Mallem</div>
+                            <div class="result-bar-container">
+                                <div class="result-bar" style="width: 52%;"></div>
+                            </div>
+                            <div class="result-votes">52%</div>
+                        </div>
+                        
+                        <h3>Secretary</h3>
+                        <div class="result-item">
+                            <div class="result-name">Pujitha Ethakota</div>
+                            <div class="result-bar-container">
+                                <div class="result-bar" style="width: 40%;"></div>
+                            </div>
+                            <div class="result-votes">40%</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-name">Jyothi Nune</div>
+                            <div class="result-bar-container">
+                                <div class="result-bar" style="width: 60%;"></div>
+                            </div>
+                            <div class="result-votes">60%</div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-block" id="back-to-vote">Back to Voting</button>
+                </div>
+            </div>
+            
+            <!-- Confirmation Screen -->
+            <div class="screen" id="confirmation-screen">
+                <div class="card">
+                    <div class="card-title">Vote Confirmed</div>
+                    <div class="alert success">
+                        <i class="fas fa-check-circle"></i> Your vote has been successfully recorded!
+                    </div>
+                    <p>Thank you for participating in the student elections. Your voice matters!</p>
+                    <p>You can view the results now or later when the election period ends.</p>
+                    
+                    <button class="btn btn-block" id="view-results-confirm">View Results</button>
+                    <button class="btn btn-outline btn-block" id="logout-btn">Logout</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 Student Voting System | Secure and Anonymous Voting</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const loginScreen = document.getElementById('login-screen');
+            const votingScreen = document.getElementById('voting-screen');
+            const resultsScreen = document.getElementById('results-screen');
+            const confirmationScreen = document.getElementById('confirmation-screen');
+            
+            const loginForm = document.getElementById('login-form');
+            const studentIdInput = document.getElementById('student-id');
+            const pinInput = document.getElementById('pin');
+            
+            const tabs = document.querySelectorAll('.tab');
+            const candidateCategories = document.querySelectorAll('.candidates-category');
+            const candidates = document.querySelectorAll('.candidate');
+            const voteAlert = document.getElementById('vote-alert');
+            const castVoteBtn = document.getElementById('cast-vote-btn');
+            const viewResultsBtn = document.getElementById('view-results-btn');
+            const backToVoteBtn = document.getElementById('back-to-vote');
+            const viewResultsConfirmBtn = document.getElementById('view-results-confirm');
+            const logoutBtn = document.getElementById('logout-btn');
+            
+            // Current selections
+            let selectedCandidates = {
+                'president': null,
+                'vice-president': null,
+                'secretary': null
+            };
+            
+            // Login form submission
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const studentId = studentIdInput.value;
+                const pin = pinInput.value;
+                
+                // Simple validation - in real app, verify against database
+                if (studentId === '12345' && pin === '2023') {
+                    showScreen(votingScreen);
+                } else {
+                    alert('Invalid credentials. Use ID: 12345 and PIN: 2023 for demo.');
+                }
+            });
+            
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding candidates
+                    candidateCategories.forEach(cat => {
+                        cat.classList.remove('active');
+                        if (cat.id === `${category}-candidates`) {
+                            cat.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
+            // Candidate selection
+            candidates.forEach(candidate => {
+                candidate.addEventListener('click', function() {
+                    const category = findCategoryForCandidate(this);
+                    const candidateId = this.getAttribute('data-id');
+                    
+                    // Deselect all candidates in this category
+                    document.querySelectorAll(`#${category}-candidates .candidate`).forEach(c => {
+                        c.classList.remove('selected');
+                    });
+                    
+                    // Select clicked candidate
+                    this.classList.add('selected');
+                    selectedCandidates[category] = candidateId;
+                    
+                    // Hide any previous alert
+                    voteAlert.style.display = 'none';
+                });
+            });
+            
+            // Cast vote button
+            castVoteBtn.addEventListener('click', function() {
+                // Check if all positions have selections
+                const allSelected = Object.values(selectedCandidates).every(val => val !== null);
+                
+                if (!allSelected) {
+                    voteAlert.style.display = 'block';
+                    return;
+                }
+                
+                // In a real app, send vote to server
+                console.log('Votes cast:', selectedCandidates);
+                
+                // Show confirmation
+                showScreen(confirmationScreen);
+            });
+            
+            // View results buttons
+            viewResultsBtn.addEventListener('click', function() {
+                showScreen(resultsScreen);
+            });
+            
+            viewResultsConfirmBtn.addEventListener('click', function() {
+                showScreen(resultsScreen);
+            });
+            
+            // Back to voting button
+            backToVoteBtn.addEventListener('click', function() {
+                showScreen(votingScreen);
+            });
+            
+            // Logout button
+            logoutBtn.addEventListener('click', function() {
+                // Reset form
+                loginForm.reset();
+                
+                // Reset selections
+                for (let key in selectedCandidates) {
+                    selectedCandidates[key] = null;
+                }
+                
+                // Deselect all candidates
+                candidates.forEach(c => c.classList.remove('selected'));
+                
+                // Show login screen
+                showScreen(loginScreen);
+            });
+            
+            // Helper function to find category for a candidate
+            function findCategoryForCandidate(candidate) {
+                for (let category of candidateCategories) {
+                    if (category.contains(candidate)) {
+                        return category.id.replace('-candidates', '');
+                    }
+                }
+                return null;
+            }
+            
+            // Helper function to show a specific screen
+            function showScreen(screen) {
+                loginScreen.classList.remove('active');
+                votingScreen.classList.remove('active');
+                resultsScreen.classList.remove('active');
+                confirmationScreen.classList.remove('active');
+                
+                screen.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
